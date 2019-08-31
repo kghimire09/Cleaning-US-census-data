@@ -1,0 +1,46 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as pyplot
+import codecademylib3_seaborn
+
+#states0 = pd.read_csv("states0.csv") #print(states0.head())
+#states1 = pd.read_csv('states1.csv')
+#print(states1.head())
+import glob 
+census = glob.glob("states*.csv") #any file with name starting with states will be taken into account. 
+df_list = [] #creating a new list of the df
+for i in census:
+  data = pd.read_csv(i)
+  df_list.append(data)
+  #the loop will go through the files and append the data. 
+census = pd.concat(df_list) #this will add them all to the list. 
+#print (census)
+census.Income = census['Income'].replace("[\$]",'', regex=True)
+census.Income = pd.to_numeric(census.Income)
+#print(census)
+split_genderpop=census['GenderPop'].str.split('_')
+census['Men'] = split_genderpop.str.get(0)
+census['Women'] =split_genderpop.str.get(1)
+census.Men = census['Men'].replace("M","",regex=True)
+census.Women = census["Women"].replace("F","",regex = True)
+census.Men = pd.to_numeric(census.Men)
+census.Women = pd.to_numeric(census.Women)
+census['Women'] = census['Women'].fillna(census.TotalPop - census.Men)
+duplicate  = census.duplicated()
+#print(duplicate.value_counts())
+census = census.drop_duplicates()
+#pyplot.scatter(census.Men, census.Women)
+#pyplot.show()
+census['Hispanic'] = census['Hispanic'].replace("%","",regex=True)
+census['White'] = census['White'].replace("%","",regex=True)
+census['Black'] = census['Black'].replace('%','',regex=True)
+census['Asian'] = census['Asian'].replace('%','',regex=True)
+census['Native']=census['Native'].replace('%','',regex=True)
+census['Pacific']= census['Pacific'].replace('%','',regex=True)
+census.Hispanic = pd.to_numeric(census.Hispanic)
+census.White = pd.to_numeric(census.White)
+census.Black = pd.to_numeric(census.Black)
+census.Asian = pd.to_numeric(census.Asian)
+census.Native = pd.to_numeric(census.Native)
+census.Pacific= pd.to_numeric(census.Pacific)
+print(census.dtypes)
